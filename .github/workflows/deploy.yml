@@ -74,6 +74,6 @@ jobs:
             fi
 
             cd infra
-            docker-compose pull mail-notifier
-            docker-compose up -d mail-notifier
-            docker image prune -f
+            sudo docker-compose pull mail-notifier
+            sudo docker-compose up -d mail-notifier
+            sudo docker image prune -f
