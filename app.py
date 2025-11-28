@@ -2,7 +2,8 @@ import os
 from datetime import datetime
 from flask import Flask, request, jsonify
 from s3_utils import head_metadata, update_metadata
-from ses_utils import send_note_email
+# from ses_utils import send_note_email
+from sns_utils import send_sns_notification
 
 app = Flask(__name__)
 SALES_NOTES_PUBLIC_URL = os.getenv("SALES_NOTES_PUBLIC_URL")
@@ -34,13 +35,14 @@ def notify():
     download_url = "%s/%s/download" % (SALES_NOTES_PUBLIC_URL.rstrip("/"), folio)
 
     subject = "Nueva nota de venta %s" % folio
-    html = """
-    <p>Estimado cliente,</p>
-    <p>Se ha generado una nueva nota de venta con folio <strong>%s</strong>.</p>
-    <p>Puede descargarla aquí: <a href="%s">%s</a></p>
-    """ % (folio, download_url, download_url)
+    
+    # Mensaje para SNS (texto plano)
+    message = f"Estimado cliente,\n\nSe ha generado una nueva nota de venta con folio {folio}.\nPuede descargarla aquí: {download_url}"
 
-    send_note_email(email, subject, html)
+    # Enviar por SNS
+    send_sns_notification(subject, message)
+    
+    # send_note_email(email, subject, html)
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
